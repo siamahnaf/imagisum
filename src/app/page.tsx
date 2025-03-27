@@ -8,6 +8,8 @@ import ImageGallery from "@/components/home/ImageGallery";
 //Types
 import { LImage } from "@/types/image.types";
 
+export const dynamic = "force-dynamic";
+
 const Page = async () => {
   const randomPage = Math.floor(Math.random() * 20) + 1;
   //Fetching Data
