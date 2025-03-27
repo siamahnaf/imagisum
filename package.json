@@ -9,6 +9,13 @@
     "lint": "next lint"
   },
   "license": "MIT",
+  "keywords": [
+    "imagisum",
+    "picsum",
+    "lorem",
+    "ipsum",
+    "lorem-ipsum-image"
+  ],
   "dependencies": {
     "@tabler/icons-react": "^3.31.0",
     "@tailwindcss/postcss": "^4.0.17",
