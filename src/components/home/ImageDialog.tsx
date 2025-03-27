@@ -65,11 +65,11 @@ const ImageDialog = ({ open, onClose, data }: Props) => {
         const minSize = Math.min(originalWidth, originalHeight) * 0.2;
         const sizes = [];
 
-        let step = Math.round(originalWidth / 4);
+        const step = Math.round(originalWidth / 4);
         let newWidth = originalWidth;
 
         while (newWidth > minSize && sizes.length < 6) {
-            let newHeight = Math.round(newWidth / aspectRatio);
+            const newHeight = Math.round(newWidth / aspectRatio);
             sizes.push({ width: newWidth, height: newHeight });
             newWidth -= step;
             if (newWidth < minSize * 1.5) break;
