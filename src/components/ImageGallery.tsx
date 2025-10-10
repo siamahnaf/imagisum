@@ -24,7 +24,6 @@ const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
     const observerTarget = useRef<HTMLDivElement>(null);
     const abortRef = useRef<AbortController | null>(null);
 
-    // debounce searchQuery
     useEffect(() => {
         const t = setTimeout(() => setDebouncedQuery(searchQuery), DEBOUNCE_MS);
         return () => clearTimeout(t);
@@ -36,10 +35,8 @@ const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
         setHasMore(true);
         setLoading(true);
         fetchPhotos(1, debouncedQuery);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedQuery]);
 
-    // Infinite scroll observer
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
@@ -76,7 +73,7 @@ const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
             } else {
                 setHasMore(false);
             }
-        } catch (error) {
+        } catch {
             console.error("Error fetching photos");
         } finally {
             setLoading(false);
@@ -92,7 +89,6 @@ const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
         fetchPhotos(nextPage, debouncedQuery);
     }, [page, hasMore, loadingMore, debouncedQuery]);
 
-    // Masonry skeleton placeholders
     if (loading && photos.length === 0) {
         const skeletons = Array.from({ length: SKELETON_COUNT }).map((_, i) => ({
             id: i,
