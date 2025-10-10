@@ -76,8 +76,8 @@ const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
             } else {
                 setHasMore(false);
             }
-        } catch (error: any) {
-            if (error?.name !== "AbortError") console.error("Error fetching photos:", error);
+        } catch (error) {
+            console.error("Error fetching photos");
         } finally {
             setLoading(false);
             setLoadingMore(false);
