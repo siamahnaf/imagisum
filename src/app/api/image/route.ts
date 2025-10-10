@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server"
 
 const PEXELS_API_KEY = process.env.PIXELS_API as string;
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const id = searchParams.get("id")

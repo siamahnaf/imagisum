@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   title: "Imagisum | Lorem image downloader with custom size for your website"
 }
 
+export const dynamic = "force-dynamic";
+
 const Page = () => {
   //Image
   const imgSrc = images[Math.floor(Math.random() * images.length)];
