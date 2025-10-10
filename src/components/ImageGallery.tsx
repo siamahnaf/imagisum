@@ -51,6 +51,7 @@ const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
                 observer.unobserve(currentTarget)
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hasMore, loadingMore, loading]);
 
     const fetchPhotos = async (pageNum: number, query: string) => {
@@ -111,7 +112,7 @@ const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
                     gap: [12, 12, 12],
                     media: [640, 768, 1024]
                 }}
-                render={(item, i) => (
+                render={(item) => (
                     <ImageCard item={item} />
                 )}
             />

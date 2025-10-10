@@ -12,7 +12,6 @@ interface Props {
     children?: ReactNode;
     backdropClassName?: string;
     className?: string;
-    /** IDs that should also receive right padding to prevent layout shift */
     padRightIds?: string[];
 }
 
@@ -33,7 +32,6 @@ const Dialog = ({
         mount: { opacity: 1 },
     };
 
-    // Track original styles so we can restore them
     const lockAppliedRef = useRef(false);
     const originalBodyOverflowRef = useRef<string | null>(null);
     const originalBodyPaddingRef = useRef<string | null>(null);
@@ -55,17 +53,14 @@ const Dialog = ({
         if (originalBodyPaddingRef.current === null)
             originalBodyPaddingRef.current = body.style.paddingRight || "";
 
-        // Apply overflow lock
         body.style.overflow = "hidden";
 
-        // Apply padding compensation to body
         const bodyComputed = window.getComputedStyle(body);
         const bodyCurrent = parseFloat(bodyComputed.paddingRight || "0") || 0;
         if (scrollbarWidth > 0) {
             body.style.paddingRight = `${bodyCurrent + scrollbarWidth}px`;
         }
 
-        // Apply padding to targets
         const originals: Record<string, string | null> = {};
         padRightIds.forEach((id) => {
             const el = document.getElementById(id);
@@ -88,7 +83,6 @@ const Dialog = ({
 
         const body = document.body;
 
-        // Restore body overflow and padding
         if (originalBodyOverflowRef.current !== null) {
             body.style.overflow = originalBodyOverflowRef.current;
             originalBodyOverflowRef.current = null;
@@ -97,8 +91,6 @@ const Dialog = ({
             body.style.paddingRight = originalBodyPaddingRef.current;
             originalBodyPaddingRef.current = null;
         }
-
-        // Restore targets
         const originals = originalTargetsPaddingRef.current || {};
         Object.keys(originals).forEach((id) => {
             const el = document.getElementById(id);
@@ -111,10 +103,8 @@ const Dialog = ({
         lockAppliedRef.current = false;
     };
 
-    // Safety: if the component unmounts while the dialog was open, restore.
     useEffect(() => {
         return () => restoreAll();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (typeof window === "undefined") return null;
@@ -134,9 +124,7 @@ const Dialog = ({
                             animate="mount"
                             variants={backdropAnimation}
                             transition={{ duration: 0.2 }}
-                            // Apply lock/padding right as soon as the enter animation starts
                             onAnimationStart={() => {
-                                // Guard so we only apply on the *enter* pass
                                 if (open && !lockAppliedRef.current) lockAndPad();
                             }}
                             onClick={onClose}
@@ -150,7 +138,6 @@ const Dialog = ({
                             exit="unmount"
                             animate="mount"
                             variants={animation}
-                            // Same guard here so we're covered even if the backdrop doesn't render first
                             onAnimationStart={() => {
                                 if (open && !lockAppliedRef.current) lockAndPad();
                             }}

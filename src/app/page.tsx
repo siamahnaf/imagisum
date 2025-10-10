@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
+
 //Components
 import RootImage from "@/components/RootImage";
+
+export const metadata: Metadata = {
+  title: "Imagisum | Lorem image downloader with custom size for your website"
+}
 
 const Page = () => {
   //Image
