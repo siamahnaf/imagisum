@@ -20,7 +20,7 @@ const ImageCard = ({ item }: Props) => {
             <div className="group cursor-pointer relative rounded-xl overflow-hidden" onClick={() => setOpen(true)}>
                 <div className="relative w-full" style={{ aspectRatio: `${item.width}/${item.height}` }}>
                     <Image
-                        src={item.src.medium || "/placeholder.svg"}
+                        src={item.src.large || "/placeholder.svg"}
                         alt={`Photo by ${item.photographer}`}
                         fill
                         className="object-cover transition-all duration-200 group-hover:scale-105"

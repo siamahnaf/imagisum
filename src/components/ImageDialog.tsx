@@ -79,7 +79,7 @@ const ImageDialog = ({ open, onClose, item }: Props) => {
             <Dialog.Body className="px-5 py-4">
                 <div className="relative aspect-video rounded-lg overflow-hidden">
                     <Image
-                        src={item.src.large || "/placeholder.svg"}
+                        src={item.src.landscape || "/placeholder.svg"}
                         alt={`Photo by ${item.photographer}`}
                         fill
                         className="object-cover"
@@ -158,7 +158,7 @@ const ImageDialog = ({ open, onClose, item }: Props) => {
                     </p>
                 </div>
                 <div className="flex gap-x-3 mt-8">
-                    <button onClick={handleDownload} disabled={downloading} className="flex-1 bg-fuchsia-700 text-white flex items-center justify-center py-2 rounded-lg">
+                    <button onClick={handleDownload} disabled={downloading} className={`flex-1 text-white flex items-center justify-center py-2 rounded-lg ${downloading ? "bg-gray-400" : "bg-fuchsia-700"}`}>
                         <IconDownload className="w-4 h-4 mr-2" />
                         {downloading ? "Downloading..." : "Download Image"}
                     </button>
