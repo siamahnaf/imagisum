@@ -103,6 +103,7 @@ const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
                         columns: [1, 2, 3],
                         gap: [12, 12, 12],
                         media: [640, 768, 1024],
+                        useBalancedLayout: true
                     }}
                     render={(item) => (
                         <div
@@ -111,6 +112,7 @@ const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
                             style={{ height: item.height }}
                         />
                     )}
+
                 />
             </div>
         );
@@ -134,6 +136,7 @@ const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
                     columns: [1, 2, 3],
                     gap: [12, 12, 12],
                     media: [640, 768, 1024],
+                    useBalancedLayout: true
                 }}
                 render={(item) => <ImageCard item={item} />}
             />

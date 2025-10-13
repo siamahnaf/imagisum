@@ -1,6 +1,6 @@
 import Container from "./ui/Container";
 import Image from "next/image";
-import { IconSearch } from "@tabler/icons-react";
+import { IconSearch, IconBrandGithubFilled } from "@tabler/icons-react";
 import Link from "next/link";
 
 //Interface
@@ -25,14 +25,22 @@ const Hero = ({ onSearch, searchQuery, imgSrc }: Props) => {
                             onChange={(e) => onSearch(e.target.value)}
                         />
                     </div>
-                    <h4 className="text-base mt-3 text-gray-600">Developed by <Link className="text-fuchsia-700 font-semibold underline underline-offset-2" href="https://siamahnaf.com/" target="_blank">Siam Ahnaf</Link> </h4>
+                    <h4 className="text-base mt-3 text-gray-600 flex gap-x-1">
+                        Developed by
+                        <Link className="text-fuchsia-700 font-semibold underline underline-offset-2" href="https://siamahnaf.com/" target="_blank">
+                            Siam Ahnaf
+                        </Link>.
+                        <Link href="https://github.com/siamahnaf/imagisum" target="_blank" className="ml-3 hover:text-fuchsia-700">
+                            <IconBrandGithubFilled />
+                        </Link>
+                    </h4>
                 </div>
                 <div className="col-span-4 h-[300px] relative">
-                    <Image src={imgSrc} width={1280} height={1920} alt="Image" className="w-full object-cover h-full rounded-xl" />
+                    <Image src={imgSrc} width={1280} height={1920} alt="Image" className="w-full object-cover object-center h-full rounded-xl" />
                     <div className="flex items-center justify-center gap-x-3">
                         <h4 className="text-base font-medium text-gray-600">Photos by</h4>
                         <Link href="https://www.pexels.com" target="_blank">
-                            <Image src="/pexels.png" width={500} height={281} alt="Pexels" className="w-[100px] object-cover object-center" />
+                            <Image src="/pexels.png" width={500} height={281} alt="Pexels" className="w-[100px]" />
                         </Link>
                     </div>
                 </div>

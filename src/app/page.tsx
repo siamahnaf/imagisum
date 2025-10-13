@@ -20,4 +20,4 @@ const Page = () => {
 
 export default Page;
 
-const images = ["/hero/i-1.jpg", "/hero/i-2.jpg", "/hero/i-3.jpg", "/hero/i-4.jpg", "/hero/i-5.jpg"]
+const images = ["/hero/i-1.jpg", "/hero/i-2.jpg", "/hero/i-3.jpg", "/hero/i-4.jpg", "/hero/i-5.jpg", "/hero/i-6.jpg", "/hero/i-7.jpg", "/hero/i-8.jpg", "/hero/i-9.jpg", "/hero/i-10.jpg", "/hero/i-11.jpg", "/hero/i-12.jpg", "/hero/i-13.jpg", "/hero/i-14.jpg", "/hero/i-15.jpg"]
