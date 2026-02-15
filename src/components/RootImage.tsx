@@ -1,5 +1,4 @@
 "use client"
-import { useState } from "react";
 import Container from "./ui/Container";
 
 //Components
@@ -8,15 +7,12 @@ import Hero from "./Hero";
 import ImageGallery from "./ImageGallery";
 
 const RootImage = ({ imgSrc }: { imgSrc: string }) => {
-    //State
-    const [searchQuery, setSearchQuery] = useState("");
-
     return (
         <main>
-            <Header onSearch={setSearchQuery} searchQuery={searchQuery} />
-            <Hero onSearch={setSearchQuery} searchQuery={searchQuery} imgSrc={imgSrc} />
+            <Header />
+            <Hero imgSrc={imgSrc} />
             <Container>
-                <ImageGallery searchQuery={searchQuery} />
+                <ImageGallery />
             </Container>
         </main>
     );

@@ -5,20 +5,18 @@ import { Masonry } from "react-plock";
 import { IconBugFilled } from "@tabler/icons-react";
 import ImageCard from "./ImageCard";
 import { PexelsPhoto } from "@/_types";
-
-interface ImageGalleryProps {
-    searchQuery: string;
-}
+import { useQueryState } from "nuqs";
 
 const SKELETON_COUNT = 15;
 const DEBOUNCE_MS = 400;
 
-const ImageGallery = ({ searchQuery }: ImageGalleryProps) => {
+const ImageGallery = () => {
     const [photos, setPhotos] = useState<PexelsPhoto[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [searchQuery] = useQueryState("q", { defaultValue: "", clearOnDefault: true });
     const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
 
     const observerTarget = useRef<HTMLDivElement>(null);

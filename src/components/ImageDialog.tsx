@@ -16,8 +16,8 @@ interface Props {
 
 const ImageDialog = ({ open, onClose, item }: Props) => {
     //State
-    const [width, setWidth] = useState(800)
-    const [height, setHeight] = useState(600)
+    const [width, setWidth] = useState<number | null>(null);
+    const [height, setHeight] = useState<number | null>(null);
     const [copied, setCopied] = useState(false)
     const [downloading, setDownloading] = useState(false)
 
@@ -29,7 +29,16 @@ const ImageDialog = ({ open, onClose, item }: Props) => {
         { label: "Medium", width: 1280, height: Math.round(1280 / aspectRatio) },
         { label: "Small", width: 640, height: Math.round(640 / aspectRatio) },
     ]
-    const imageUrl = `/api/image?id=${item.id}&width=${width}&height=${height}`
+
+    //Creating Image URL
+    const imageUrl = (() => {
+        const params = new URLSearchParams({ id: String(item.id) })
+
+        if (width != null) params.set("width", String(width))
+        if (height != null) params.set("height", String(height))
+
+        return `/image?${params.toString()}`
+    })()
 
     const handleSizeSelect = (w: number, h: number) => {
         setWidth(w)
@@ -57,7 +66,7 @@ const ImageDialog = ({ open, onClose, item }: Props) => {
             window.URL.revokeObjectURL(url)
             document.body.removeChild(a)
         } catch (error) {
-            console.error("[v0] Error downloading image:", error)
+            console.error("Error downloading image:", error)
         } finally {
             setDownloading(false)
         }
@@ -119,8 +128,12 @@ const ImageDialog = ({ open, onClose, item }: Props) => {
                         <input
                             id="width"
                             type="number"
-                            value={width}
-                            onChange={(e) => setWidth(Number(e.target.value))}
+                            value={width || ""}
+                            placeholder="800"
+                            onChange={(e) => {
+                                const v = e.target.value
+                                setWidth(v === "" ? null : Number(v))
+                            }}
                             min={100}
                             max={4000}
                             className="w-full border border-solid border-gray-200 px-2.5 py-1.5 rounded-lg shadow-xs mt-1"
@@ -131,8 +144,12 @@ const ImageDialog = ({ open, onClose, item }: Props) => {
                         <input
                             id="height"
                             type="number"
-                            value={height}
-                            onChange={(e) => setHeight(Number(e.target.value))}
+                            value={height || ""}
+                            placeholder="300"
+                            onChange={(e) => {
+                                const v = e.target.value
+                                setHeight(v === "" ? null : Number(v))
+                            }}
                             min={100}
                             max={4000}
                             className="w-full border border-solid border-gray-200 px-2.5 py-1.5 rounded-lg shadow-xs mt-1"
@@ -144,7 +161,7 @@ const ImageDialog = ({ open, onClose, item }: Props) => {
                     <div className="flex gap-2">
                         <input
                             id="url"
-                            value={imageUrl}
+                            value={`${window.location.origin}${imageUrl}`}
                             readOnly
                             className="font-mono w-full text-sm border border-solid border-gray-200 py-2 px-3 rounded-lg"
                         />
@@ -153,12 +170,12 @@ const ImageDialog = ({ open, onClose, item }: Props) => {
                         </button>
                     </div>
                     <p className="text-xs text-[#606369]">
-                        Use with your domain:{" "}
+                        Example:{" "}
                         <code className="bg-[#ecf1f8] px-1 py-0.5 rounded">{`<img src="${window.location.origin}${imageUrl}" />`}</code>
                     </p>
                 </div>
                 <div className="flex gap-x-3 mt-8">
-                    <button onClick={handleDownload} disabled={downloading} className={`flex-1 text-white flex items-center justify-center py-2 rounded-lg ${downloading ? "bg-gray-400" : "bg-fuchsia-700"}`}>
+                    <button onClick={handleDownload} disabled={downloading} className={`flex-1 text-white flex items-center justify-center py-2 rounded-lg ${(downloading || (!width && !height)) ? "bg-gray-400" : "bg-fuchsia-700"}`}>
                         <IconDownload className="w-4 h-4 mr-2" />
                         {downloading ? "Downloading..." : "Download Image"}
                     </button>

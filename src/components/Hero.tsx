@@ -2,15 +2,17 @@ import Container from "./ui/Container";
 import Image from "next/image";
 import { IconSearch, IconBrandGithubFilled } from "@tabler/icons-react";
 import Link from "next/link";
+import { useQueryState } from "nuqs";
 
 //Interface
 interface Props {
-    onSearch: (query: string) => void;
-    searchQuery: string;
     imgSrc: string;
 }
 
-const Hero = ({ onSearch, searchQuery, imgSrc }: Props) => {
+const Hero = ({ imgSrc }: Props) => {
+    //State
+    const [searchQuery, setSearchQuery] = useQueryState("q", { defaultValue: "", clearOnDefault: true });
+
     return (
         <section className="py-8">
             <Container className="grid grid-cols-12 gap-x-10 items-center">
@@ -21,8 +23,8 @@ const Hero = ({ onSearch, searchQuery, imgSrc }: Props) => {
                         <input
                             placeholder="Search for images..."
                             className="bg-[#f7f7f7] w-full pr-2.5 pl-11 py-5 rounded-lg focus:outline-fuchsia-700"
-                            value={searchQuery}
-                            onChange={(e) => onSearch(e.target.value)}
+                            value={searchQuery || ""}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                     <h4 className="text-base mt-3 text-gray-600 flex gap-x-1">
