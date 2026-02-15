@@ -9,7 +9,7 @@ interface Props {
 
 const Container = ({ children, className }: Props) => {
     return (
-        <div className={twMerge("xl:container xl:mx-auto px-[130px]", className)}>
+        <div className={twMerge("xl:container xl:mx-auto xl:px-[130px] md:px-[60px]", className)}>
             {children}
         </div>
     );
