@@ -26,8 +26,11 @@ const snippetTabs: { key: SnippetKind; label: string }[] = [
 const CustomizePanel = ({ photo, className, dense }: Props) => {
     const ratio = photo.width / photo.height;
 
-    const [width, setWidth] = useState<number | null>(1280);
-    const [height, setHeight] = useState<number | null>(Math.round(1280 / ratio));
+    // Held as raw strings while typing. Clamping mid-keystroke would rewrite "1"
+    // into "16" before the user can finish typing "1280", and make the field
+    // impossible to clear. Bounds are enforced on blur instead.
+    const [widthInput, setWidthInput] = useState("1280");
+    const [heightInput, setHeightInput] = useState(String(Math.round(1280 / ratio)));
     // Free by default — most people come here to force an exact box.
     const [locked, setLocked] = useState(false);
     const [fit, setFit] = useState<Fit>("crop");
@@ -37,6 +40,10 @@ const CustomizePanel = ({ photo, className, dense }: Props) => {
 
     // window is only available client-side; keeps SSR markup stable.
     useEffect(() => setOrigin(window.location.origin), []);
+
+    // An empty field means "auto" — that dimension is left off the URL.
+    const width = widthInput === "" ? null : Number(widthInput);
+    const height = heightInput === "" ? null : Number(heightInput);
 
     const path = useMemo(
         () => buildImageUrl({ id: photo.id, width, height, fit }),
@@ -68,22 +75,38 @@ const CustomizePanel = ({ photo, className, dense }: Props) => {
     };
 
     const applyPreset = (w: number, h: number) => {
-        setWidth(w);
-        setHeight(h);
+        setWidthInput(String(w));
+        setHeightInput(String(h));
     };
 
+    /** Digits only, so `type=number` quirks like "e" and "-" can't get in. */
+    const digitsOnly = (raw: string) => raw.replace(/\D/g, "").slice(0, 5);
+
     const onWidthChange = (raw: string) => {
-        if (raw === "") return setWidth(null);
-        const next = clampDimension(Number(raw));
-        setWidth(next);
-        if (locked) setHeight(Math.max(1, Math.round(next / ratio)));
+        const next = digitsOnly(raw);
+        setWidthInput(next);
+        if (locked && next) setHeightInput(String(Math.max(1, Math.round(Number(next) / ratio))));
     };
 
     const onHeightChange = (raw: string) => {
-        if (raw === "") return setHeight(null);
-        const next = clampDimension(Number(raw));
-        setHeight(next);
-        if (locked) setWidth(Math.max(1, Math.round(next * ratio)));
+        const next = digitsOnly(raw);
+        setHeightInput(next);
+        if (locked && next) setWidthInput(String(Math.max(1, Math.round(Number(next) * ratio))));
+    };
+
+    /** Snap into the supported range once the user is done with the field. */
+    const commitWidth = () => {
+        if (!widthInput) return;
+        const clamped = clampDimension(Number(widthInput));
+        setWidthInput(String(clamped));
+        if (locked) setHeightInput(String(Math.max(1, Math.round(clamped / ratio))));
+    };
+
+    const commitHeight = () => {
+        if (!heightInput) return;
+        const clamped = clampDimension(Number(heightInput));
+        setHeightInput(String(clamped));
+        if (locked) setWidthInput(String(Math.max(1, Math.round(clamped * ratio))));
     };
 
     const presets = sizePresets(photo);
@@ -142,12 +165,12 @@ const CustomizePanel = ({ photo, className, dense }: Props) => {
                     <label className="block">
                         <span className="mb-1.5 block text-xs font-medium text-fg-muted">Width (px)</span>
                         <input
-                            type="number"
+                            type="text"
                             inputMode="numeric"
-                            value={width ?? ""}
+                            pattern="[0-9]*"
+                            value={widthInput}
                             onChange={(event) => onWidthChange(event.target.value)}
-                            min={16}
-                            max={6000}
+                            onBlur={commitWidth}
                             placeholder="auto"
                             className="h-11 w-full rounded-xl border border-border bg-bg px-3 font-mono text-sm outline-none transition-colors focus:border-brand"
                         />
@@ -155,17 +178,21 @@ const CustomizePanel = ({ photo, className, dense }: Props) => {
                     <label className="block">
                         <span className="mb-1.5 block text-xs font-medium text-fg-muted">Height (px)</span>
                         <input
-                            type="number"
+                            type="text"
                             inputMode="numeric"
-                            value={height ?? ""}
+                            pattern="[0-9]*"
+                            value={heightInput}
                             onChange={(event) => onHeightChange(event.target.value)}
-                            min={16}
-                            max={6000}
+                            onBlur={commitHeight}
                             placeholder="auto"
                             className="h-11 w-full rounded-xl border border-border bg-bg px-3 font-mono text-sm outline-none transition-colors focus:border-brand"
                         />
                     </label>
                 </div>
+
+                <p className="mt-2 text-xs text-fg-subtle">
+                    16–6000 px. Leave a field empty to keep that side automatic.
+                </p>
 
                 <div className="mt-3 flex items-center gap-2">
                     <span className="text-xs font-medium text-fg-muted">Fit</span>
