@@ -1,0 +1,15 @@
+{
+  "pages": {
+    "/api/photos/route": [
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_5d797fa0._.js",
+      "static/chunks/e4dd2_next_dist_compiled_react-dom_f7277cf5._.js",
+      "static/chunks/e4dd2_next_dist_compiled_next-devtools_index_d17ac6ca.js",
+      "static/chunks/e4dd2_next_dist_compiled_3f07cab1._.js",
+      "static/chunks/e4dd2_next_dist_client_e56d0e04._.js",
+      "static/chunks/e4dd2_next_dist_d9fea621._.js",
+      "static/chunks/69652_@swc_helpers_cjs_77b72907._.js",
+      "static/chunks/_a0ff3932._.js",
+      "static/chunks/turbopack-_c5f12a44._.js"
+    ]
+  }
+}

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@siamf/next-progress':
+        specifier: ^2.0.1
+        version: 2.0.1(next@15.5.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tabler/icons-react':
         specifier: ^3.35.0
         version: 3.35.0(react@19.1.0)
@@ -381,6 +384,13 @@ packages:
 
   '@rushstack/eslint-patch@1.13.0':
     resolution: {integrity: sha512-2ih5qGw5SZJ+2fLZxP6Lr6Na2NTIgPRL/7Kmyuw0uIyBQnuhQ8fi8fzUTd38eIQmqp+GYLC00cI6WgtqHxBwmw==}
+
+  '@siamf/next-progress@2.0.1':
+    resolution: {integrity: sha512-CE+J01wMvLy4DhoX6+yn9oCYMt/Xq0yc/fvAEKoUNzfROyrl/4F87u9eFzny16HSHwLiyuIYDcF2B5Px2juTAw==}
+    peerDependencies:
+      next: ^15 || ^16
+      react: ^19
+      react-dom: ^19
 
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
@@ -1508,6 +1518,9 @@ packages:
       sass:
         optional: true
 
+  nprogress@0.2.0:
+    resolution: {integrity: sha512-I19aIingLgR1fmhftnbWWO3dXc0hSxqHQHQb3H8m+K3TnEn/iSeTZZOyvKXWqQESMwuUVnatlCnZdLBZZt2VSA==}
+
   nuqs@2.8.8:
     resolution: {integrity: sha512-LF5sw9nWpHyPWzMMu9oho3r9C5DvkpmBIg4LQN78sexIzGaeRx8DWr0uy3YiFx5i2QGZN1Qqcb+OAtEVRa2bnA==}
     peerDependencies:
@@ -1817,6 +1830,7 @@ packages:
   tar@7.5.1:
     resolution: {integrity: sha512-nlGpxf+hv0v7GkWBK2V9spgactGOp0qvfWRxUMjqHyzrt3SgwE48DIv/FhqPHJYLHpgW1opq3nERbz5Anq7n1g==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   tinyglobby@0.2.15:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
@@ -2152,6 +2166,13 @@ snapshots:
   '@rtsao/scc@1.1.0': {}
 
   '@rushstack/eslint-patch@1.13.0': {}
+
+  '@siamf/next-progress@2.0.1(next@15.5.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      next: 15.5.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      nprogress: 0.2.0
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   '@standard-schema/spec@1.0.0': {}
 
@@ -3390,6 +3411,8 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
+
+  nprogress@0.2.0: {}
 
   nuqs@2.8.8(next@15.5.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0):
     dependencies:

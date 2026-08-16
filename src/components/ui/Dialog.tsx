@@ -107,6 +107,15 @@ const Dialog = ({
         return () => restoreAll();
     }, []);
 
+    useEffect(() => {
+        if (!open) return;
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") onClose();
+        };
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [open, onClose]);
+
     if (typeof window === "undefined") return null;
 
     return createPortal(
@@ -116,7 +125,7 @@ const Dialog = ({
                     <>
                         <m.div
                             className={twMerge(
-                                "bg-black/55 fixed top-0 left-0 w-full h-full flex justify-center items-center z-[999]",
+                                "bg-black/60 backdrop-blur-sm fixed top-0 left-0 w-full h-full flex justify-center items-center z-[999]",
                                 backdropClassName
                             )}
                             initial="unmount"
@@ -131,7 +140,7 @@ const Dialog = ({
                         />
                         <m.div
                             className={twMerge(
-                                "fixed inset-0 h-max m-auto z-[9999] overflow-auto bg-white rounded-2xl",
+                                "fixed inset-0 h-max m-auto z-[9999] overflow-auto bg-bg-elevated text-fg border border-border rounded-2xl shadow-2xl",
                                 className
                             )}
                             initial="unmount"
@@ -171,13 +180,14 @@ const Header = ({
 }: HeaderProps) => {
     return (
         <div className={twMerge("flex items-center gap-4", className)}>
-            <h4 className={twMerge("text-xl flex-1 font-semibold text-strong", titleClassName)}>
+            <h4 className={twMerge("text-lg flex-1 font-semibold tracking-tight", titleClassName)}>
                 {title}
             </h4>
             {onClose && (
                 <button
+                    aria-label="Close dialog"
                     className={twMerge(
-                        "hover:bg-white/10 p-1 text-strong rounded-md transition-all",
+                        "hover:bg-bg-inset p-1.5 text-fg-muted hover:text-fg rounded-lg transition-colors",
                         buttonClassName
                     )}
                     onClick={onClose}
@@ -200,7 +210,7 @@ const Body = ({ className, children, id }: BodyProps) => {
     return (
         <div
             className={twMerge(
-                "max-h-[80vh] min-h-[100px] overflow-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full",
+                "max-h-[80vh] min-h-[100px] overflow-auto [&::-webkit-scrollbar]:w-1.5",
                 className
             )}
             id={id}

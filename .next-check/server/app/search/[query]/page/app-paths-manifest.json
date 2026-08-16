@@ -1,0 +1,3 @@
+{
+  "/search/[query]/page": "app/search/[query]/page.js"
+}

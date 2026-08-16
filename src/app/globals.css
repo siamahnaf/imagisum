@@ -1,19 +1,194 @@
 @import "tailwindcss";
 
-@theme {
-    /* Screens */
-  --breakpoint-xxs: 0px;
-  --breakpoint-xs: 360px;
-  --breakpoint-sm: 480px;
-  --breakpoint-msm: 540px;
-  --breakpoint-lsm: 640px;
-  --breakpoint-md: 768px;
-  --breakpoint-lg: 1024px;
-  --breakpoint-xl: 1280px;
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------ *
+ * Design tokens — semantic, theme aware
+ * ------------------------------------------------------------------ */
+:root {
+    --bg: #ffffff;
+    --bg-subtle: #f6f6f8;
+    --bg-elevated: #ffffff;
+    --bg-inset: #f0f0f3;
+
+    --fg: #0b0b0f;
+    --fg-muted: #585b66;
+    --fg-subtle: #8b8f9a;
+
+    --border: #e7e7ec;
+    --border-strong: #d4d5dd;
+
+    --brand: #a21caf;
+    --brand-hover: #86198f;
+    --brand-soft: #fbf1fd;
+    --brand-fg: #ffffff;
+
+    --ring: #d946ef;
+    --overlay: 10 10 12;
 }
 
-@layer utilities {
-    button {
-        @apply cursor-pointer;
+.dark {
+    --bg: #0a0a0c;
+    --bg-subtle: #121216;
+    --bg-elevated: #17171c;
+    --bg-inset: #1d1d23;
+
+    --fg: #f3f3f6;
+    --fg-muted: #a2a4ae;
+    --fg-subtle: #74767f;
+
+    --border: #26262e;
+    --border-strong: #35353f;
+
+    --brand: #e879f9;
+    --brand-hover: #f0abfc;
+    --brand-soft: #2b1030;
+    --brand-fg: #1a0a1d;
+
+    --ring: #e879f9;
+    --overlay: 0 0 0;
+}
+
+@theme inline {
+    /* Screens */
+    --breakpoint-xxs: 0px;
+    --breakpoint-xs: 360px;
+    --breakpoint-sm: 480px;
+    --breakpoint-msm: 540px;
+    --breakpoint-lsm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1536px;
+
+    /* Colors */
+    --color-bg: var(--bg);
+    --color-bg-subtle: var(--bg-subtle);
+    --color-bg-elevated: var(--bg-elevated);
+    --color-bg-inset: var(--bg-inset);
+
+    --color-fg: var(--fg);
+    --color-fg-muted: var(--fg-muted);
+    --color-fg-subtle: var(--fg-subtle);
+
+    --color-border: var(--border);
+    --color-border-strong: var(--border-strong);
+
+    --color-brand: var(--brand);
+    --color-brand-hover: var(--brand-hover);
+    --color-brand-soft: var(--brand-soft);
+    --color-brand-fg: var(--brand-fg);
+
+    --color-ring: var(--ring);
+
+    /* Motion */
+    --animate-fade-up: fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-fade-in: fade-in 0.3s ease-out both;
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ------------------------------------------------------------------ *
+ * Base
+ * ------------------------------------------------------------------ */
+@layer base {
+    * {
+        border-color: var(--border);
+    }
+
+    html {
+        scroll-behavior: smooth;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        background-color: var(--bg);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    ::selection {
+        background-color: var(--brand);
+        color: var(--brand-fg);
+    }
+
+    button,
+    [role="button"] {
+        cursor: pointer;
+    }
+
+    button:disabled {
+        cursor: not-allowed;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+    }
+
+    /* Scrollbars */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-strong) transparent;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--border-strong);
+        border-radius: 9999px;
+        border: 3px solid transparent;
+        background-clip: content-box;
+    }
+}
+
+/* ------------------------------------------------------------------ *
+ * Utilities
+ * ------------------------------------------------------------------ */
+@utility no-scrollbar {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
