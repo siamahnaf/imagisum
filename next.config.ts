@@ -1,11 +1,16 @@
 import type { NextConfig } from "next";
 
+const TARGET = "https://imagisum.netlify.app";
+
 const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: [{
-      protocol: "https",
-      hostname: "images.pexels.com"
-    }]
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        destination: `${TARGET}/:path*`,
+        permanent: true
+      }
+    ];
   }
 };
 

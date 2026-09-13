@@ -1,54 +1,30 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/logo/logo-white.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/logo/logo-black.png">
-  <img alt="Siam Ahnaf" src="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/logo/logo-black.png" height="auto" width="240">
-</picture>
+# Imagisum — redirect only
 
-# Imagisum
-Lorem Ipsum... but for photos using pexels with download custom image options and listing some default images.
+This project no longer hosts the Imagisum app. It exists only to forward traffic
+from the old Vercel deployment to the current home on Netlify:
 
-## Visit
-[https://imagisum.vercel.app/](https://imagisum.vercel.app/)
+**https://imagisum.netlify.app**
 
-## Contribute & Issue
-Contributions are welcome! If you have any feature ideas, please feel free to contribute. Additionally, if you notice any issues, please create an issue.
+## How it works
 
-## Webinuxs
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/logo/webinuxs-logo-white.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/logo/webinuxs-logo-black.png">
-  <img alt="Siam Ahnaf" src="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/logo/webinuxs-logo-black.png" height="auto" width="140">
-</picture> <br/>
-Explore Webinuxs, where we bring your web and mobile app applications to life at competitive prices. Our dedicated team is committed to delivering exceptional quality and innovative web and mobile application as your needs.
+[next.config.ts](next.config.ts) declares a single catch-all redirect:
 
-## Support
-Need assistance? Drop me a line at mail@siamahnaf.com or hop on over to my lively <a href="https://wa.me/message/UAXIYNES562EN1"><img src="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/icons/whatsapp.png" width="15" height="15"></a> messenger.
+```
+/:path*  →  https://imagisum.netlify.app/:path*   (308 permanent)
+```
 
-## Author(s)
-- [www.siamahnaf.com](https://www.siamahnaf.com/)
+The path and query string are preserved, so old deep links keep working.
+[src/app/page.tsx](src/app/page.tsx) is a fallback redirect for the root; no
+other routes, components, or API endpoints remain.
 
-## Who I am?
-I'm Siam Ahnaf, a passionate developer who loves to learn new things and create awesome projects. I enjoy working on front-end, back-end, and mobile app development and have experience with various programming languages and frameworks.
+## The old app
 
-- **Frontend Development**
-I specialize in creating custom web and mobile applications as your unique needs and requirements.
-- **Backend Development**
-My backend development services cover everything from database design to server-side logic.
-- **Cloud Services**
-I take care of deploying your web applications to production environments securely.
+The full source is still in git history — see the commit before this one
+(`bfdb192`) or `git log` to restore it.
 
-## Connect with me
-<div style="display: flex; align-items: center; gap: 3px;">
-<a href="https://wa.me/8801611994403"><img src="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/icons/whatsapp.png" width="40" height="40"></a>
-<a href="https://siamahnaf.com/" style="margin-right: 8px"><img src="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/icons/web.png" width="40" height="40"></a>
-<a href="https://www.linkedin.com/in/siamahnaf/" style="margin-right: 8px"><img src="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/icons/linkedin.png" width="40" height="40"></a>
-<a href="https://x.com/siamahnaf198" style="margin-right: 8px"><img src="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/icons/x.png" width="40" height="40"></a>
-<a href="https://www.facebook.com/siamahnaf198/" style="margin-right: 8px"><img src="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/icons/facebook.png" width="40" height="40"></a>
-<a href="https://t.me/siamahnaf198" style="margin-right: 8px"><img src="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/icons/telegram.png" width="40" height="40"></a>
-<a href="https://www.npmjs.com/~siamahnaf" style="margin-right: 8px"><img src="https://raw.githubusercontent.com/siamahnaf/assets-kit/main/icons/npm.png" width="40" height="40"></a>
-</div>
+## Notes
 
-
-------------
-
-<p align="center" color="red"><a href="https://www.siamahnaf.com/">www.siamahnaf.com</a></p>
+- The redirect is **permanent (308)** and browsers cache it aggressively. If you
+  ever need to serve real content from this domain again, change the redirect to
+  `permanent: false` first and allow time for caches to expire.
+- The Vercel project's Framework Preset must stay **Next.js**.
