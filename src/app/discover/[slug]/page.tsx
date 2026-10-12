@@ -7,15 +7,13 @@ import PhotoGrid from "@/components/photo/PhotoGrid";
 import CategoryRail from "@/components/home/CategoryRail";
 import Notice from "@/components/ui/Notice";
 import { getCategory } from "@/lib/categories";
-import { emptyPage, getCategoryPhotos } from "@/lib/photos";
-import { describeError } from "@/lib/unsplash";
+import { emptyPage, FALLBACK_MESSAGE, getCategoryPhotos } from "@/lib/photos";
 
 /**
- * Categories are fixed queries, so the page and its listing keep for an hour.
- * Not prerendered at build: that would spend a request per category on every
- * deploy. Each one renders on its first visit and is cached from then on.
+ * Rendered per request, so a Picsum fallback is never pinned in a cached page.
+ * The Pixabay answer underneath is cached on the server for most of a day.
  */
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -41,8 +39,9 @@ const CategoryPage = async ({ params }: PageProps) => {
 
     try {
         initial = await getCategoryPhotos(category.query);
-    } catch (error) {
-        problem = describeError(error, "category");
+        if (initial.fallback) problem = FALLBACK_MESSAGE;
+    } catch {
+        problem = "This category couldn't load right now. Try again in a moment.";
     }
 
     return (

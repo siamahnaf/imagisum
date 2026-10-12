@@ -7,11 +7,13 @@ import PageHeader from "@/components/ui/PageHeader";
 import PhotoGrid from "@/components/photo/PhotoGrid";
 import Notice from "@/components/ui/Notice";
 import Chip from "@/components/ui/Chip";
-import { emptyPage, getSearchPhotos } from "@/lib/photos";
-import { describeError } from "@/lib/unsplash";
+import { emptyPage, FALLBACK_MESSAGE, getSearchPhotos } from "@/lib/photos";
 import { categories, popularSearches } from "@/lib/categories";
 
-/** Search is never cached — every search asks Unsplash fresh. */
+/**
+ * Rendered per request, but the Pixabay answer underneath is cached on the
+ * server for most of a day — a repeated search costs no quota.
+ */
 export const dynamic = "force-dynamic";
 
 interface PageProps {
@@ -44,8 +46,9 @@ const SearchPage = async ({ params }: PageProps) => {
 
     try {
         initial = await getSearchPhotos(term);
-    } catch (error) {
-        problem = describeError(error, "search");
+        if (initial.fallback) problem = FALLBACK_MESSAGE;
+    } catch {
+        problem = "This search couldn't load right now. Try again in a moment.";
     }
 
     const related = categories

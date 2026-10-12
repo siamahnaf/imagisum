@@ -4,7 +4,7 @@ import { IconBrandGithubFilled, IconWorld } from "@tabler/icons-react";
 import Container from "../ui/Container";
 import Logo from "./Logo";
 import { categories } from "@/lib/categories";
-import { UNSPLASH_URL } from "@/lib/constants";
+import { PIXABAY_URL } from "@/lib/constants";
 
 const columns = [
     {
@@ -107,14 +107,14 @@ const Footer = () => (
                     . Free for personal and commercial use.
                 </p>
                 <Link
-                    href={UNSPLASH_URL}
+                    href={PIXABAY_URL}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-2.5 text-sm text-fg-muted transition-opacity hover:opacity-75"
                 >
                     Photos by
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/unplash-logo.png" alt="Unsplash" width={1906} height={435} className="h-4 w-auto" />
+                    <img src="/pixabay-logo.png" alt="Pixabay" width={2000} height={546} className="h-4 w-auto" />
                 </Link>
             </div>
         </Container>

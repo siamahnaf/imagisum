@@ -28,7 +28,7 @@ async function failureMessage(response: Response): Promise<string> {
     } catch {
         /* not a JSON error body — fall back to the status */
     }
-    if (response.status === 429) return "Unsplash's hourly request limit has been reached. Please try again in a little while.";
+    if (response.status === 429) return "Pixabay's rate limit has been reached. Please try again in a minute.";
     return `The image could not be downloaded (HTTP ${response.status}).`;
 }
 
@@ -54,6 +54,6 @@ export async function downloadPhoto(photo: Photo, transform: ImageTransform): Pr
 
     saveBlob(
         await response.blob(),
-        downloadName(photo, transform.width ?? null, transform.height ?? null, outputFormat(photo.source, transform.format))
+        downloadName(photo, transform.width ?? null, transform.height ?? null, outputFormat(transform.format))
     );
 }

@@ -4,13 +4,13 @@ import { formatId } from "./photo-id";
 /**
  * Lorem Picsum: no key and no rate limit, but also no search — about a
  * thousand hand-picked Unsplash photos. It covers the places where any good
- * photo will do: the hero, the random endpoint, and the home feed whenever
- * Unsplash is unavailable.
+ * photo will do: the hero, the random endpoint, hotlinks, and every listing
+ * whenever Pixabay is unavailable.
  */
 const ROOT = "https://picsum.photos";
 
-/** The catalogue barely changes; an hour keeps the hero varied enough. */
-const LIST_REVALIDATE = 60 * 60;
+/** The catalogue barely changes, so a listing keeps for a day. */
+const LIST_REVALIDATE = 24 * 60 * 60;
 
 /** 993 photos at the time of writing: ten pages of 100. */
 const RANDOM_PAGES = 9;
@@ -35,6 +35,8 @@ function normalise(raw: RawPicsum): Photo {
     return {
         id: formatId("picsum", raw.id),
         source: "picsum",
+        // Picsum's catalogue is hand-picked Unsplash photos; the links go there.
+        siteName: "Unsplash",
         width: raw.width,
         height: raw.height,
         color: null,
@@ -67,7 +69,7 @@ export async function getPicsumPage(page = 1, perPage = 24): Promise<PhotoPage> 
     };
 }
 
-/** One photo from anywhere in the catalogue. Each page is cached for an hour. */
+/** One photo from anywhere in the catalogue. Each page is cached for a day. */
 export async function getRandomPicsum(): Promise<Photo | null> {
     try {
         const page = 1 + Math.floor(Math.random() * RANDOM_PAGES);

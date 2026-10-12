@@ -9,5 +9,5 @@ export const SITE_NAME = "Imagisum";
 export const SITE_DESCRIPTION =
     "Search free stock photos and download them at any size — or hotlink them straight into your markup.";
 export const GITHUB_URL = "https://github.com/siamahnaf/imagisum";
-/** Unsplash asks for these UTM params on every link back to them. */
-export const UNSPLASH_URL = "https://unsplash.com/?utm_source=imagisum&utm_medium=referral";
+/** Pixabay asks to be credited wherever its search results are shown. */
+export const PIXABAY_URL = "https://pixabay.com/";

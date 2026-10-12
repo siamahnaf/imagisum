@@ -8,7 +8,7 @@ import { twMerge } from "tailwind-merge";
 import Container from "../ui/Container";
 import Logo from "./Logo";
 import SearchBar from "../search/SearchBar";
-import { GITHUB_URL, HEADER_HEIGHT, UNSPLASH_URL } from "@/lib/constants";
+import { GITHUB_URL, HEADER_HEIGHT, PIXABAY_URL } from "@/lib/constants";
 
 const navItems = [
     { href: "/", label: "Home", icon: IconHome },
@@ -124,7 +124,7 @@ const Header = () => {
 
                     <div className="flex shrink-0 items-center gap-0.5">
                         <Link
-                            href={UNSPLASH_URL}
+                            href={PIXABAY_URL}
                             target="_blank"
                             rel="noreferrer"
                             className={twMerge(
@@ -135,10 +135,10 @@ const Header = () => {
                             Photos by
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                                src="/unplash-logo.png"
-                                alt="Unsplash"
-                                width={1906}
-                                height={435}
+                                src="/pixabay-logo.png"
+                                alt="Pixabay"
+                                width={2000}
+                                height={546}
                                 className={twMerge("h-4 w-auto", onHero && "brightness-0 invert")}
                             />
                         </Link>
@@ -224,14 +224,14 @@ const Header = () => {
                         </Link>
                     </nav>
                     <Link
-                        href={UNSPLASH_URL}
+                        href={PIXABAY_URL}
                         target="_blank"
                         rel="noreferrer"
                         className="mt-4 flex items-center gap-2 border-t border-border px-6 pt-4 text-sm text-fg-muted"
                     >
                         Photos by
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/unplash-logo.png" alt="Unsplash" width={1906} height={435} className="h-4 w-auto" />
+                        <img src="/pixabay-logo.png" alt="Pixabay" width={2000} height={546} className="h-4 w-auto" />
                     </Link>
                 </div>
             </div>

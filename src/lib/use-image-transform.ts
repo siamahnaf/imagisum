@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { buildImageUrl, clampDimension, type ImageTransform } from "./image-url";
+import { buildImageUrl, clampDimension, maxDimensionFor, type ImageTransform } from "./image-url";
 import { Photo } from "@/_types";
 
 /**
@@ -10,12 +10,15 @@ import { Photo } from "@/_types";
  */
 export function useImageTransform(photo: Photo) {
     const ratio = photo.width / photo.height;
+    const max = maxDimensionFor(photo.source);
+    // 1280 wide where the photo allows it, shrunk so neither side passes the cap.
+    const startWidth = Math.max(1, Math.min(1280, max, Math.floor(max * ratio)));
 
     // Held as raw strings while typing. Clamping mid-keystroke would rewrite "1"
     // into "16" before the user can finish typing "1280", and make the field
     // impossible to clear. Bounds are enforced on blur instead.
-    const [widthInput, setWidthInput] = useState("1280");
-    const [heightInput, setHeightInput] = useState(String(Math.round(1280 / ratio)));
+    const [widthInput, setWidthInput] = useState(String(startWidth));
+    const [heightInput, setHeightInput] = useState(String(Math.round(startWidth / ratio)));
     const [locked, setLocked] = useState(false);
     const [focalX, setFocalX] = useState(0.5);
     const [focalY, setFocalY] = useState(0.5);
@@ -24,11 +27,11 @@ export function useImageTransform(photo: Photo) {
     // A new photo starts from scratch: the last one's box and anchor mean
     // nothing for a picture of a different shape.
     useEffect(() => {
-        setWidthInput("1280");
-        setHeightInput(String(Math.round(1280 / ratio)));
+        setWidthInput(String(startWidth));
+        setHeightInput(String(Math.round(startWidth / ratio)));
         setFocalX(0.5);
         setFocalY(0.5);
-    }, [photo.id, ratio]);
+    }, [photo.id, ratio, startWidth]);
 
     // window is only available client-side; keeps SSR markup stable.
     useEffect(() => setOrigin(window.location.origin), []);
@@ -68,17 +71,17 @@ export function useImageTransform(photo: Photo) {
     /** Snap into the supported range once the user is done with the field. */
     const commitWidth = useCallback(() => {
         if (!widthInput) return;
-        const clamped = clampDimension(Number(widthInput));
+        const clamped = clampDimension(Number(widthInput), max);
         setWidthInput(String(clamped));
         if (locked) setHeightInput(String(Math.max(1, Math.round(clamped / ratio))));
-    }, [widthInput, locked, ratio]);
+    }, [widthInput, locked, ratio, max]);
 
     const commitHeight = useCallback(() => {
         if (!heightInput) return;
-        const clamped = clampDimension(Number(heightInput));
+        const clamped = clampDimension(Number(heightInput), max);
         setHeightInput(String(clamped));
         if (locked) setWidthInput(String(Math.max(1, Math.round(clamped * ratio))));
-    }, [heightInput, locked, ratio]);
+    }, [heightInput, locked, ratio, max]);
 
     const applyPreset = useCallback((w: number, h: number) => {
         setWidthInput(String(w));
@@ -91,6 +94,7 @@ export function useImageTransform(photo: Photo) {
     }, []);
 
     return {
+        max,
         widthInput,
         heightInput,
         width,

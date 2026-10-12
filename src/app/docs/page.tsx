@@ -14,14 +14,13 @@ export const metadata: Metadata = {
 };
 
 const params = [
-    { name: "id", type: "string", required: "Required*", body: "`u-<id>` for an Unsplash photo, `p-<id>` (or just the number) for a Picsum one. Copy it from any photo's download dialog." },
-    { name: "random", type: "0 | 1", required: "Required*", body: "A different photo on every request. Use instead of `id`." },
-    { name: "query", type: "string", required: "Optional", body: "Narrows random mode to a subject, e.g. `nature`, `office`." },
-    { name: "width", type: "16–6000", required: "Optional", body: "Output width in pixels. Alias: `w`." },
-    { name: "height", type: "16–6000", required: "Optional", body: "Output height in pixels. Alias: `h`." },
+    { name: "id", type: "string", required: "Required*", body: "`x-<id>` for a Pixabay photo, `p-<id>` (or just the number) for a Picsum one. Copy it from any photo's download dialog." },
+    { name: "random", type: "0 | 1", required: "Required*", body: "A different Picsum photo on every request. Use instead of `id`." },
+    { name: "width", type: "16–6000", required: "Optional", body: "Output width in pixels. Alias: `w`. Pixabay photos stop at 1280." },
+    { name: "height", type: "16–6000", required: "Optional", body: "Output height in pixels. Alias: `h`. Pixabay photos stop at 1280." },
     { name: "fp-x", type: "0–1", required: "Optional", body: "Horizontal crop anchor, where 0 is the left edge. Applies when both sides are set." },
     { name: "fp-y", type: "0–1", required: "Optional", body: "Vertical crop anchor, where 0 is the top edge. Applies when both sides are set." },
-    { name: "format", type: "jpg | png | webp | avif", required: "Optional", body: "Output encoding. Defaults to jpg. Picsum photos serve webp in place of avif." },
+    { name: "format", type: "jpg | png | webp | avif", required: "Optional", body: "Output encoding. Defaults to jpg. avif is served as webp." },
     { name: "q", type: "1–100", required: "Optional", body: "Quality for lossy formats. Defaults to 80." },
     { name: "blur", type: "0–100", required: "Optional", body: "Blur, for background art and loading states." },
     { name: "grayscale", type: "0 | 1", required: "Optional", body: "Strips all colour." },
@@ -116,7 +115,7 @@ const DocsPage = () => (
                 <CodeBlock
                     className="mt-5"
                     code={`<img src="/image?random=1&width=600&height=400" alt="" />
-<img src="/image?random=1&query=mountains&width=1200&height=630" alt="" />`}
+<img src="/image?random=1&width=1200&height=630&grayscale=1" alt="" />`}
                 />
             </section>
 
@@ -126,17 +125,26 @@ const DocsPage = () => (
                     <li className="flex gap-3">
                         <span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand" />
                         <span>
-                            Photos come from Unsplash (directly, and through Lorem Picsum) and are free to use under
-                            the{" "}
+                            Photos come from Pixabay and from Lorem Picsum (hand-picked Unsplash photos), free to use
+                            under the{" "}
                             <Link
-                                href="https://unsplash.com/license?utm_source=imagisum&utm_medium=referral"
+                                href="https://pixabay.com/service/license-summary/"
                                 target="_blank"
                                 rel="noreferrer"
                                 className="font-medium text-brand underline underline-offset-2"
                             >
-                                Unsplash licence
-                            </Link>
-                            .
+                                Pixabay
+                            </Link>{" "}
+                            and{" "}
+                            <Link
+                                href="https://unsplash.com/license"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="font-medium text-brand underline underline-offset-2"
+                            >
+                                Unsplash
+                            </Link>{" "}
+                            licences.
                         </span>
                     </li>
                     <li className="flex gap-3">

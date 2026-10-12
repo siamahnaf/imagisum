@@ -10,8 +10,8 @@ import { getRandomPicsum } from "@/lib/picsum";
 
 /**
  * Rendered per request so the hero changes on every visit — which is free:
- * the hero comes from Picsum (no limit), and the feed from Unsplash is cached
- * for an hour, so a visit costs no quota at all.
+ * the hero comes from Picsum (no limit), and the feed from Pixabay is cached
+ * on the server for most of a day, so a visit costs no quota at all.
  */
 export const dynamic = "force-dynamic";
 
@@ -59,7 +59,7 @@ const Page = async () => {
             <Container className="pt-10">
                 <div className="mb-6">
                     <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">Curated for you</h2>
-                    <p className="mt-1.5 text-sm text-fg-muted">Fresh picks from the Unsplash editorial feed.</p>
+                    <p className="mt-1.5 text-sm text-fg-muted">Editor&apos;s Choice picks from Pixabay.</p>
                 </div>
 
                 <PhotoGrid

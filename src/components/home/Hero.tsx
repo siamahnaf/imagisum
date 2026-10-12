@@ -71,14 +71,7 @@ const Hero = ({ photo, fallbackSrc }: Props) => (
                     {photo.photographer}
                 </Link>
                 on
-                <Link
-                    href="https://unsplash.com/?utm_source=imagisum&utm_medium=referral"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-medium text-white transition-opacity hover:opacity-80"
-                >
-                    Unsplash
-                </Link>
+                <span className="font-medium text-white">{photo.siteName}</span>
             </div>
         )}
     </section>

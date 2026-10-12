@@ -1,10 +1,9 @@
-import { after, type NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getRandomPhoto } from "@/lib/photos";
 import { getPicsumInfo, picsumUrl } from "@/lib/picsum";
-import { getRawUrl, trackDownload, UnsplashError } from "@/lib/unsplash";
-import { parseId, type ParsedId } from "@/lib/photo-id";
+import { getLargeImageUrl, PixabayError } from "@/lib/pixabay";
+import { isRetiredId, parseId, type ParsedId } from "@/lib/photo-id";
 import {
-    buildUnsplashUrl,
     clamp,
     clampDimension,
     clampFocal,
@@ -13,6 +12,7 @@ import {
     downloadName,
     FORMATS,
     isOffCentre,
+    maxDimensionFor,
     outputFormat,
     type Format,
     type ImageTransform
@@ -74,21 +74,71 @@ class HttpError extends Error {
 function errorResponse(message: string, status: number) {
     // Failures must never be cached, or a blip gets pinned for a year.
     const headers: Record<string, string> = { ...CORS, ...cacheHeaders("none") };
-    // Unsplash quotas reset hourly; tell clients not to hammer us before then.
-    if (status === 429) headers["Retry-After"] = "600";
+    // Pixabay's limit is per minute; tell clients not to hammer us before then.
+    if (status === 429) headers["Retry-After"] = "60";
     return NextResponse.json({ error: message }, { status, headers });
 }
 
-async function unsplashUpstream(id: string, transform: ImageTransform): Promise<string> {
+/** Where wsrv.nl should cut the box from, as a `focal-x-y` anchor in percent. */
+function focalAnchor(transform: ImageTransform): string {
+    const percent = (value: number | null | undefined) => Math.round(clampFocal(value ?? 0.5) * 100);
+    return `focal-${percent(transform.focalX)}-${percent(transform.focalY)}`;
+}
+
+/**
+ * Where wsrv.nl can reach our source route: the configured site URL, else
+ * Vercel's production domain (so preview deployments, which sit behind
+ * Vercel's login, borrow production's), else whatever this request came to.
+ * Request headers are deliberately not trusted here — a forged Host would end
+ * up in a redirect that is cached for a year.
+ */
+function sourceOrigin(request: NextRequest): string {
+    if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/+$/, "");
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    return request.nextUrl.origin;
+}
+
+/** wsrv.nl has to fetch our source route, which it can't do on a dev machine. */
+function isPublicOrigin(origin: string): boolean {
+    const host = new URL(origin).hostname;
+    return !/^(localhost|127\.|0\.0\.0\.0|\[::1\]|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)|\.local$/.test(host);
+}
+
+/**
+ * Pixabay forbids hotlinking its own URLs (which expire after a day anyway),
+ * so wsrv.nl resizes from `/image/source/x-<id>` — the 1280px copy held in our
+ * server cache, downloaded from Pixabay once. In local development wsrv can't
+ * reach this machine, so it is pointed at Pixabay directly instead.
+ */
+async function pixabayUpstream(id: string, transform: ImageTransform, origin: string): Promise<string> {
+    let source = `${origin}/image/source/x-${id}`;
     try {
-        return buildUnsplashUrl(await getRawUrl(id), transform);
+        if (!isPublicOrigin(origin)) source = await getLargeImageUrl(id);
     } catch (error) {
-        if (error instanceof UnsplashError) {
-            if (error.status === 404) throw new HttpError("No photo with that id.", 404);
-            if (error.status === 429) throw new HttpError(error.message, 429);
+        if (error instanceof PixabayError) {
+            if (error.status === 404 || error.status === 400) throw new HttpError("No photo with that id.", 404);
+            if (error.status === 429) throw new HttpError("Pixabay's rate limit has been reached. Try again in a minute.", 429);
         }
         throw new HttpError("Upstream photo lookup failed.", 502);
     }
+
+    // Past 1280px there are no more pixels to give; shrink the box, keeping its shape.
+    const max = maxDimensionFor("pixabay");
+    const scale = Math.min(1, max / (transform.width ?? max), max / (transform.height ?? max));
+    const width = transform.width ? Math.round(transform.width * scale) : null;
+    const height = transform.height ? Math.round(transform.height * scale) : null;
+
+    const params = new URLSearchParams({ url: source, output: outputFormat(transform.format) });
+    if (width) params.set("w", String(width));
+    if (height) params.set("h", String(height));
+    if (width && height) {
+        params.set("fit", "cover");
+        params.set("a", focalAnchor(transform));
+    }
+    params.set("q", String(transform.quality ?? DEFAULT_QUALITY));
+    if (transform.blur) params.set("blur", String(Math.max(0.3, Math.round(transform.blur) / 4)));
+    if (transform.grayscale) params.set("filt", "greyscale");
+    return `https://wsrv.nl/?${params}`;
 }
 
 /**
@@ -99,7 +149,7 @@ async function unsplashUpstream(id: string, transform: ImageTransform): Promise<
  */
 async function picsumUpstream(id: string, transform: ImageTransform): Promise<string> {
     let { width, height } = transform;
-    const format = outputFormat("picsum", transform.format);
+    const format = outputFormat(transform.format);
     // Picsum's own effects: a bare `grayscale` flag, and blur on a 1–10 scale.
     const effects = [
         transform.grayscale && "grayscale",
@@ -140,13 +190,12 @@ async function picsumUpstream(id: string, transform: ImageTransform): Promise<st
     const coverH = Math.max(h, Math.ceil(info.height * scale));
     if (coverW > 10000 || coverH > 10000) throw new HttpError("That size is too extreme for this photo.", 400);
 
-    const percent = (value: number | null | undefined) => Math.round(clampFocal(value ?? 0.5) * 100);
     const params = new URLSearchParams({
         url: picsumUrl(id, coverW, coverH) + suffix,
         w: String(w),
         h: String(h),
         fit: "cover",
-        a: `focal-${percent(transform.focalX)}-${percent(transform.focalY)}`,
+        a: focalAnchor(transform),
         output: format,
         q: String(transform.quality ?? DEFAULT_QUALITY)
     });
@@ -177,15 +226,20 @@ async function serve(request: NextRequest) {
     let id = params.get("id");
 
     if (random) {
-        const photo = await getRandomPhoto(params.get("query")?.trim() || undefined);
-        if (!photo) return errorResponse("No photo matched that query.", 404);
+        const photo = await getRandomPhoto();
+        if (!photo) return errorResponse("No random photo is available right now.", 502);
         id = photo.id;
     }
 
-    if (!id) return errorResponse("Provide `id`, or `random=1` (optionally with `query`).", 400);
+    if (!id) return errorResponse("Provide `id`, or `random=1`.", 400);
+
+    if (isRetiredId(id)) {
+        return errorResponse("Unsplash photos are no longer available. Pick a photo again, or use `random=1`.", 410);
+    }
 
     const parsed: ParsedId | null = parseId(id);
-    if (!parsed) return errorResponse("`id` must look like `u-<unsplash id>` or `p-<picsum id>`.", 400);
+    if (!parsed) return errorResponse("`id` must look like `p-<picsum id>` or `x-<pixabay id>`.", 400);
+
 
     // Random and downloads are always fresh; a specific photo at a specific
     // size never changes, so its link is cached for good.
@@ -194,26 +248,23 @@ async function serve(request: NextRequest) {
 
     try {
         const upstream =
-            parsed.source === "unsplash"
-                ? await unsplashUpstream(parsed.raw, transform)
+            parsed.source === "pixabay"
+                ? await pixabayUpstream(parsed.raw, transform, sourceOrigin(request))
                 : await picsumUpstream(parsed.raw, transform);
 
-        // A plain link just points the browser at the provider's CDN: nothing
-        // flows through this server, and Unsplash asks for hotlinking anyway.
+        // A plain link just points the browser at the image CDN (Picsum, or
+        // wsrv.nl for Pixabay): no image bytes flow through this function.
         if (!download) {
             headers.set("Location", upstream);
             return new NextResponse(null, { status: 302, headers });
         }
 
-        const format = outputFormat(parsed.source, transform.format);
+        const format = outputFormat(transform.format);
         const { body, type } = await render(upstream, format);
         headers.set("Content-Type", type);
 
-        if (download) {
-            const name = downloadName({ id }, transform.width ?? null, transform.height ?? null, format);
-            headers.set("Content-Disposition", `attachment; filename="${name}"`);
-            if (parsed.source === "unsplash") after(() => trackDownload(parsed.raw));
-        }
+        const name = downloadName({ id }, transform.width ?? null, transform.height ?? null, format);
+        headers.set("Content-Disposition", `attachment; filename="${name}"`);
 
         return new NextResponse(body, { headers });
     } catch (error) {

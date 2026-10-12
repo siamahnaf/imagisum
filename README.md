@@ -5,14 +5,14 @@
 </picture>
 
 # Imagisum
-Lorem Ipsum... but for photos. Photos from Unsplash and Lorem Picsum, downloadable or hotlinkable at any size.
+Lorem Ipsum... but for photos. Photos from Pixabay and Lorem Picsum, downloadable or hotlinkable at any size.
 
 ## Setup
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) 18.18 or later (20 LTS recommended)
 - [pnpm](https://pnpm.io/) 10 or later (`npm install -g pnpm`)
-- An Unsplash access key. Create an app at [unsplash.com/developers](https://unsplash.com/developers) to get one. Lorem Picsum needs no key.
+- A Pixabay API key. Sign up at [pixabay.com](https://pixabay.com/accounts/register/), then find your key in the [API docs](https://pixabay.com/api/docs/). Lorem Picsum needs no key.
 
 ### 1. Clone the repository
 ```bash
@@ -28,13 +28,15 @@ pnpm install
 ### 3. Configure environment variables
 Create a `.env.local` file in the project root:
 ```bash
-UNSPLASH_ACCESS_KEY=your_unsplash_access_key
+PIXABAY_API_KEY=your_pixabay_api_key
 
 # Optional: public URL used for metadata, sitemap and robots.txt
 # Defaults to https://imagisum.vercel.app
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
-To spread requests across several keys, separate them with commas (`UNSPLASH_ACCESS_KEY=key1,key2`) or add suffixed variables such as `UNSPLASH_ACCESS_KEY_2`. When one key hits its rate limit, the next one is tried.
+Pixabay allows 100 requests a minute per key and asks for every answer to be cached for 24 hours. Imagisum caches each Pixabay answer on the server (Next's fetch cache) for 23 hours, shared by all visitors, so a repeated search costs nothing. Whenever Pixabay fails, listings fall back to Lorem Picsum.
+
+Pixabay doesn't allow hotlinking its own URLs, so each Pixabay photo is downloaded once into the same server cache and served from `/image/source/x-<id>`; wsrv.nl resizes from there. Pixabay photos go up to 1280px. `random=1` always uses Lorem Picsum. In local development wsrv.nl can't reach your machine, so it fetches from Pixabay directly.
 
 ### 4. Run the development server
 ```bash

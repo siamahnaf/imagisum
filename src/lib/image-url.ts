@@ -28,8 +28,13 @@ export const MIN_DIMENSION = 16;
 export const MAX_DIMENSION = 6000;
 export const DEFAULT_QUALITY = 80;
 
-export function clampDimension(value: number): number {
-    return Math.min(MAX_DIMENSION, Math.max(MIN_DIMENSION, Math.round(value)));
+/** Pixabay hands out at most a 1280px copy without full API access; anything larger would be upscaled. */
+export function maxDimensionFor(source: PhotoSource): number {
+    return source === "pixabay" ? 1280 : MAX_DIMENSION;
+}
+
+export function clampDimension(value: number, max = MAX_DIMENSION): number {
+    return Math.min(max, Math.max(MIN_DIMENSION, Math.round(value)));
 }
 
 export function clamp(value: number, min: number, max: number): number {
@@ -87,37 +92,9 @@ export function buildImageUrl({
     return `/image?${params.toString()}`;
 }
 
-/**
- * Unsplash serves through imgix, so resizing, cropping and encoding are all
- * done by their CDN from query params on the raw URL.
- */
-export function buildUnsplashUrl(raw: string, transform: ImageTransform): string {
-    const url = new URL(raw);
-    const { width, height } = transform;
-
-    if (width) url.searchParams.set("w", String(width));
-    if (height) url.searchParams.set("h", String(height));
-
-    if (width && height) {
-        url.searchParams.set("fit", "crop");
-        if (isOffCentre(transform)) {
-            url.searchParams.set("crop", "focalpoint");
-            url.searchParams.set("fp-x", String(clampFocal(transform.focalX ?? 0.5)));
-            url.searchParams.set("fp-y", String(clampFocal(transform.focalY ?? 0.5)));
-        }
-    }
-
-    url.searchParams.set("fm", transform.format ?? "jpg");
-    url.searchParams.set("q", String(transform.quality ?? DEFAULT_QUALITY));
-    if (transform.blur) url.searchParams.set("blur", String(Math.round(clamp(transform.blur, 0, 100) * 20)));
-    if (transform.grayscale) url.searchParams.set("sat", "-100");
-
-    return url.toString();
-}
-
-/** The format actually served: wsrv.nl can't encode AVIF, so Picsum falls back to WebP. */
-export function outputFormat(source: PhotoSource, format: Format | undefined): Format {
-    if (source === "picsum" && format === "avif") return "webp";
+/** The format actually served: every photo goes through Picsum or wsrv.nl, neither of which encodes AVIF. */
+export function outputFormat(format: Format | undefined): Format {
+    if (format === "avif") return "webp";
     return format ?? "jpg";
 }
 
@@ -131,12 +108,13 @@ export interface SizePreset {
     height: number;
 }
 
-/** Ratio-preserving presets plus a few real-world layout sizes. */
-export function sizePresets(photo: { width: number; height: number }): SizePreset[] {
+/** Ratio-preserving presets plus a few real-world layout sizes, minus any the photo can't fill. */
+export function sizePresets(photo: { width: number; height: number; source: PhotoSource }): SizePreset[] {
     const ratio = photo.width / photo.height;
+    const max = maxDimensionFor(photo.source);
     const scaled = (w: number) => ({ width: w, height: Math.max(1, Math.round(w / ratio)) });
 
-    return [
+    const presets: SizePreset[] = [
         { label: "Large", ...scaled(1920) },
         { label: "Medium", ...scaled(1280) },
         { label: "Small", ...scaled(640) },
@@ -144,6 +122,7 @@ export function sizePresets(photo: { width: number; height: number }): SizePrese
         { label: "Square", width: 1080, height: 1080 },
         { label: "Story", width: 1080, height: 1920 }
     ];
+    return presets.filter((preset) => preset.width <= max && preset.height <= max);
 }
 
 /** Safe filename for a downloaded photo. */

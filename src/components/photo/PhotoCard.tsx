@@ -55,7 +55,7 @@ const PhotoCard = ({ item, priority, className }: Props) => {
                 </button>
 
                 {/* Outside the button, so the credit links are real, separately
-                    clickable links — Unsplash requires both to be linked. */}
+                    clickable links back to the photographer and the photo's page. */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-2 p-4 opacity-0 transition-all duration-200 focus-within:translate-y-0 focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100">
                     <p className="truncate text-label text-white/80">
                         Photo by{" "}
@@ -74,7 +74,7 @@ const PhotoCard = ({ item, priority, className }: Props) => {
                             rel="noreferrer"
                             className="pointer-events-auto font-semibold text-white hover:underline"
                         >
-                            Unsplash
+                            {item.siteName}
                         </a>
                     </p>
                     <p className="mt-0.5 flex items-center gap-1.5 text-meta font-medium text-white/75">

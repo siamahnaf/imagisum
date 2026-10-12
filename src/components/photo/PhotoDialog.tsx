@@ -49,10 +49,6 @@ const PhotoDialog = ({ open, onClose, photo }: Props) => {
         try {
             await navigator.clipboard.writeText(t.fullUrl);
             setCopied(true);
-            // Copying the link is using the photo, which Unsplash counts as a download.
-            if (photo.source === "unsplash") {
-                fetch(`/api/track?id=${encodeURIComponent(photo.id)}`, { method: "POST" }).catch(() => {});
-            }
             setTimeout(() => setCopied(false), 1800);
         } catch {
             /* clipboard blocked — the field is selectable as a fallback */
@@ -101,7 +97,7 @@ const PhotoDialog = ({ open, onClose, photo }: Props) => {
                             </Link>
                             on
                             <Link href={photo.pageUrl} target="_blank" rel="noreferrer" className="font-medium hover:underline">
-                                Unsplash
+                                {photo.siteName}
                             </Link>
                         </p>
                     </div>
@@ -178,7 +174,7 @@ const PhotoDialog = ({ open, onClose, photo }: Props) => {
                                 </label>
                             </div>
                             <p className="mt-2 text-label text-fg-subtle">
-                                16–6000 px. Leave a field empty to keep that side automatic.
+                                16–{t.max} px. Leave a field empty to keep that side automatic.
                             </p>
                         </section>
 

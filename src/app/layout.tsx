@@ -22,7 +22,7 @@ export const metadata: Metadata = {
         "placeholder images",
         "lorem ipsum images",
         "image resizer",
-        "unsplash"
+        "pixabay"
     ],
     openGraph: {
         type: "website",

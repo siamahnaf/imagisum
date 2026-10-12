@@ -1,7 +1,7 @@
 export interface Category {
     slug: string;
     name: string;
-    /** What we actually send to Unsplash — often broader than the display name. */
+    /** What we actually send to Pixabay — often broader than the display name. */
     query: string;
     description: string;
     /** Accent gradient for the category. */
